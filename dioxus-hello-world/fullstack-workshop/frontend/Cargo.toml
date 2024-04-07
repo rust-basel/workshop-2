@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 dioxus = { version = "0.5.1", features = ["web"] }
+manganis = "0.2.2"
