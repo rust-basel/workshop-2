@@ -18,7 +18,8 @@ async fn main() {
     let app = Router::new()
         .route("/", get(hello_world))
         .route("/:name", get(hello_name))
-        .route("/your-route", post(workshop_echo));
+        .route("/your-route", post(workshop_echo))
+        .route("/items", get(get_items));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();
     axum::serve(listener, app).await.unwrap();
@@ -34,4 +35,27 @@ struct Workshop {
 
 async fn workshop_echo(Json(workshop): Json<Workshop>) -> impl IntoResponse {
     Json(workshop)
+}
+
+#[derive(Serialize)]
+pub struct ShoppingListItem {
+    pub title: String,
+    pub posted_by: String,
+    pub uuid: String,
+}
+
+async fn get_items() -> impl IntoResponse {
+    let items = vec!["milk", "eggs", "potatoes", "dogfood"];
+
+    let uuid: &str = "a28e2805-196b-4cdb-ba5c-a1ac18ea264a";
+    let result: Vec<ShoppingListItem> = items
+        .iter()
+        .map(|item| ShoppingListItem {
+            title: item.to_string(),
+            posted_by: "Roland".to_string(),
+            uuid: uuid.to_string(),
+        })
+        .collect();
+
+    Json(result)
 }
