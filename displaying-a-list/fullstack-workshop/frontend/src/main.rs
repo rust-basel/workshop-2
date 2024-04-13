@@ -17,3 +17,15 @@ pub fn App() -> Element {
         }
     }
 }
+
+use model::ShoppingListItem;
+
+async fn get_items() -> Result<Vec<ShoppingListItem>, reqwest::Error> {
+    let url = "http://localhost:3001/items";
+    let list = reqwest::get(url)
+        .await?
+        .json::<Vec<ShoppingListItem>>()
+        .await;
+
+    list
+}
