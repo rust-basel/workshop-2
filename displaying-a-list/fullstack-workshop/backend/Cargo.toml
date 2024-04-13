@@ -8,3 +8,4 @@ axum = "0.7.5"
 serde = { version = "1.0.197", features = ["derive"] }
 tokio = { version = "1.37.0", features = ["full"] }
 tower-http = { version = "0.5.2", features = ["cors"] }
+model = { path = "../model" }

@@ -25,6 +25,7 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
+use model::ShoppingListItem;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -35,13 +36,6 @@ struct Workshop {
 
 async fn workshop_echo(Json(workshop): Json<Workshop>) -> impl IntoResponse {
     Json(workshop)
-}
-
-#[derive(Serialize)]
-pub struct ShoppingListItem {
-    pub title: String,
-    pub posted_by: String,
-    pub uuid: String,
 }
 
 async fn get_items() -> impl IntoResponse {
