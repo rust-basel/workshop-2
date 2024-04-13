@@ -1,3 +1,5 @@
+mod database;
+
 use axum::{
     extract::Path,
     response::IntoResponse,
