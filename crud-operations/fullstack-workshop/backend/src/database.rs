@@ -4,9 +4,10 @@ pub struct InMemoryDatabase {
     inner: HashMap<String, ShoppingItem>,
 }
 
-struct ShoppingItem {
-    title: String,
-    creator: String,
+#[derive(Clone)]
+pub struct ShoppingItem {
+    pub title: String,
+    pub creator: String,
 }
 
 impl InMemoryDatabase {
@@ -20,6 +21,13 @@ impl InMemoryDatabase {
 
     pub fn delete_item(&mut self, uuid: &str) {
         self.inner.remove(uuid);
+    }
+
+    pub fn as_vec(&self) -> Vec<(String, ShoppingItem)> {
+        self.inner
+            .iter()
+            .map(|(uuid, item)| (uuid.clone(), item.clone()))
+            .collect()
     }
 }
 

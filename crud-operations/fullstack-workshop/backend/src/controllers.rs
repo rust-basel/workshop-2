@@ -1,18 +1,21 @@
-use axum::{response::IntoResponse, Json};
+use axum::{extract::State, response::IntoResponse, Json};
 use model::ShoppingListItem;
 
-pub async fn get_items() -> impl IntoResponse {
-    let items = vec!["milk", "eggs", "potatoes", "dogfood"];
+use crate::Database;
 
-    let uuid: &str = "a28e2805-196b-4cdb-ba5c-a1ac18ea264a";
-    let result: Vec<ShoppingListItem> = items
+pub async fn get_items(State(state): State<Database>) -> impl IntoResponse {
+    let items: Vec<ShoppingListItem> = state
+        .read()
+        .unwrap()
+        .as_vec()
         .iter()
-        .map(|item| ShoppingListItem {
-            title: item.to_string(),
-            posted_by: "Roland".to_string(),
-            uuid: uuid.to_string(),
+        .cloned()
+        .map(|(uuid, item)| ShoppingListItem {
+            title: item.title,
+            posted_by: item.creator,
+            uuid,
         })
         .collect();
 
-    Json(result)
+    Json(items)
 }
