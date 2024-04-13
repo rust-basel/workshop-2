@@ -1,5 +1,7 @@
 mod database;
 
+use std::sync::{Arc, RwLock};
+
 use axum::{
     extract::Path,
     response::IntoResponse,
@@ -15,18 +17,23 @@ async fn hello_name(Path(name): Path<String>) -> impl IntoResponse {
     format!("Hello {name}")
 }
 
+type Database = Arc<RwLock<InMemoryDatabase>>;
+
 #[tokio::main]
 async fn main() {
+    let db = Database::default();
     let app = Router::new()
         .route("/", get(hello_world))
         .route("/:name", get(hello_name))
         .route("/your-route", post(workshop_echo))
-        .route("/items", get(get_items));
+        .route("/items", get(get_items))
+        .with_state(db);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
 
+use database::InMemoryDatabase;
 use model::ShoppingListItem;
 use serde::{Deserialize, Serialize};
 
