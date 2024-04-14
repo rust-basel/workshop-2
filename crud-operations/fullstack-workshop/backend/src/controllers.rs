@@ -1,4 +1,9 @@
-use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
+use axum::{
+    extract::{Path, State},
+    http::StatusCode,
+    response::IntoResponse,
+    Json,
+};
 use model::{PostShopItem, ShoppingListItem};
 use uuid::Uuid;
 
@@ -46,4 +51,17 @@ pub async fn add_item(
         }),
     )
         .into_response()
+}
+
+pub async fn delete_item(
+    State(state): State<Database>,
+    Path(uuid): Path<Uuid>,
+) -> impl IntoResponse {
+    let Ok(mut db) = state.write() else {
+        return StatusCode::SERVICE_UNAVAILABLE;
+    };
+
+    db.delete_item(&uuid.to_string());
+
+    StatusCode::OK
 }
