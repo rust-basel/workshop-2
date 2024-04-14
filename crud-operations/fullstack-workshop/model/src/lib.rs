@@ -6,3 +6,9 @@ pub struct ShoppingListItem {
     pub posted_by: String,
     pub uuid: String,
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct PostShopItem {
+    pub title: String,
+    pub posted_by: String,
+}
