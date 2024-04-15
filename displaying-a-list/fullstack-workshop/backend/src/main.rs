@@ -19,7 +19,8 @@ async fn main() {
         .route("/", get(hello_world))
         .route("/:name", get(hello_name))
         .route("/your-route", post(workshop_echo))
-        .route("/items", get(get_items));
+        .route("/items", get(get_items))
+        .layer(CorsLayer::permissive());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();
     axum::serve(listener, app).await.unwrap();
@@ -27,6 +28,7 @@ async fn main() {
 
 use model::ShoppingListItem;
 use serde::{Deserialize, Serialize};
+use tower_http::cors::CorsLayer;
 
 #[derive(Serialize, Deserialize)]
 struct Workshop {
