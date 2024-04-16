@@ -27,6 +27,7 @@ async fn main() {
         .route("/:name", get(hello_name))
         .route("/your-route", post(workshop_echo))
         .route("/items", get(get_items))
+        .layer(CorsLayer::permissive())
         .with_state(db);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();
@@ -36,6 +37,7 @@ async fn main() {
 use database::InMemoryDatabase;
 use model::ShoppingListItem;
 use serde::{Deserialize, Serialize};
+use tower_http::cors::CorsLayer;
 
 #[derive(Serialize, Deserialize)]
 struct Workshop {
