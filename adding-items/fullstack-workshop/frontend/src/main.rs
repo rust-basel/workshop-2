@@ -16,10 +16,11 @@ pub fn App() -> Element {
             "My stylish button"
         }
         ShoppingList{}
+        ItemInput{}
     }
 }
 
-use model::ShoppingListItem;
+use model::{PostShopItem, ShoppingListItem};
 
 async fn get_items() -> Result<Vec<ShoppingListItem>, reqwest::Error> {
     let url = "http://localhost:3001/items";
@@ -29,6 +30,18 @@ async fn get_items() -> Result<Vec<ShoppingListItem>, reqwest::Error> {
         .await;
 
     list
+}
+
+async fn post_item(item: PostShopItem) -> Result<ShoppingListItem, reqwest::Error> {
+    let response = reqwest::Client::new()
+        .post("http://localhost:3001/items")
+        .json(&item)
+        .send()
+        .await?
+        .json::<ShoppingListItem>()
+        .await?;
+
+    Ok(response)
 }
 
 #[component]
@@ -42,6 +55,50 @@ fn ShoppingListItemComponent(display_name: String, posted_by: String) -> Element
             }
             span {
                 "posted by {posted_by}"
+            }
+        }
+    }
+}
+
+#[component]
+fn ItemInput() -> Element {
+    let mut item = use_signal(|| "".to_string());
+    let mut author = use_signal(|| "".to_string());
+
+    let onsubmit = move |evt: FormEvent| {};
+
+    rsx! {
+        div {
+            class: "w-300 m-4 mt-16 rounded",
+            form { class: "grid grid-cols-3 gap-2",
+                onsubmit: onsubmit,
+                div {
+                    input {
+                        value: "{item}",
+                        class: "input input-bordered input-primary w-full",
+                        placeholder: "next item..",
+                        r#type: "text",
+                        id: "item_name",
+                        name: "item_name",
+                        oninput: move |e| item.set(e.data.value().clone())
+                    }
+                }
+                div {
+                    input {
+                        value: "{author}",
+                        class: "input input-bordered input-primary w-full",
+                        placeholder: "wanted by..",
+                        r#type: "text",
+                        id: "author",
+                        name: "author",
+                        oninput: move |e| author.set(e.data.value().clone())
+                    }
+                }
+                button {
+                    class: "btn btn-primary w-full",
+                    r#type: "submit",
+                    "Commit"
+                }
             }
         }
     }
