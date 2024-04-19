@@ -65,7 +65,19 @@ fn ItemInput() -> Element {
     let mut item = use_signal(|| "".to_string());
     let mut author = use_signal(|| "".to_string());
 
-    let onsubmit = move |evt: FormEvent| {};
+    let onsubmit = move |_| {
+        spawn({
+            async move {
+                let item_name = item.read().to_string();
+                let author = author.read().to_string();
+                let _ = post_item(PostShopItem {
+                    title: item_name,
+                    posted_by: author,
+                })
+                .await;
+            }
+        });
+    };
 
     rsx! {
         div {
