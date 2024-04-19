@@ -6,6 +6,7 @@ fn main() {
 
 #[allow(non_snake_case)]
 pub fn App() -> Element {
+    let change_signal = use_signal(|| ListChanged);
     let rust_basel = "Rust Basel";
     rsx! {
         h1{
@@ -15,8 +16,8 @@ pub fn App() -> Element {
             class: "btn",
             "My stylish button"
         }
-        ShoppingList{}
-        ItemInput{}
+        ShoppingList{change_signal}
+        ItemInput{change_signal}
     }
 }
 
@@ -61,7 +62,7 @@ fn ShoppingListItemComponent(display_name: String, posted_by: String) -> Element
 }
 
 #[component]
-fn ItemInput() -> Element {
+fn ItemInput(change_signal: Signal<ListChanged>) -> Element {
     let mut item = use_signal(|| "".to_string());
     let mut author = use_signal(|| "".to_string());
 
@@ -116,8 +117,10 @@ fn ItemInput() -> Element {
     }
 }
 
+struct ListChanged;
+
 #[component]
-fn ShoppingList() -> Element {
+fn ShoppingList(change_signal: Signal<ListChanged>) -> Element {
     let items_request = use_resource(move || async move { get_items().await });
 
     match &*items_request.read_unchecked() {
