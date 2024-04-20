@@ -71,11 +71,15 @@ fn ItemInput(change_signal: Signal<ListChanged>) -> Element {
             async move {
                 let item_name = item.read().to_string();
                 let author = author.read().to_string();
-                let _ = post_item(PostShopItem {
+                let response = post_item(PostShopItem {
                     title: item_name,
                     posted_by: author,
                 })
                 .await;
+
+                if response.is_ok() {
+                    change_signal.write();
+                }
             }
         });
     };
@@ -121,7 +125,10 @@ struct ListChanged;
 
 #[component]
 fn ShoppingList(change_signal: Signal<ListChanged>) -> Element {
-    let items_request = use_resource(move || async move { get_items().await });
+    let items_request = use_resource(move || async move {
+        change_signal.read();
+        get_items().await
+    });
 
     match &*items_request.read_unchecked() {
         Some(Ok(list)) => rsx! {
