@@ -9,8 +9,6 @@ use uuid::Uuid;
 
 use crate::{database::ShoppingItem, Database};
 
-const LIST_UUID: &str = "9e137e61-08ac-469d-be9d-6b3324dd20ad";
-
 pub async fn get_items(
     Path(list_uuid): Path<Uuid>,
     State(state): State<Database>,
