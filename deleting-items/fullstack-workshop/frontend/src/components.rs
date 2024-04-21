@@ -4,7 +4,12 @@ use model::PostShopItem;
 use crate::controllers::{delete_item, get_items, post_item};
 
 #[component]
-fn ShoppingListItemComponent(display_name: String, posted_by: String, item_id: String) -> Element {
+fn ShoppingListItemComponent(
+    display_name: String,
+    posted_by: String,
+    item_id: String,
+    change_signal: Signal<ListChanged>,
+) -> Element {
     rsx! {
         div {
             class: "flex items-center space-x-2",
@@ -15,7 +20,7 @@ fn ShoppingListItemComponent(display_name: String, posted_by: String, item_id: S
             span {
                 "posted by {posted_by}"
             }
-            ItemDeleteButton {item_id}
+            ItemDeleteButton {item_id, change_signal}
         }
     }
 }
@@ -100,7 +105,8 @@ pub fn ShoppingList(change_signal: Signal<ListChanged>) -> Element {
                             ShoppingListItemComponent{
                                 display_name: i.title.clone(),
                                 posted_by: i.posted_by.clone(),
-                                item_id: i.uuid.clone()
+                                item_id: i.uuid.clone(),
+                                change_signal
                             },
                         }
                     }
@@ -125,12 +131,15 @@ pub fn ShoppingList(change_signal: Signal<ListChanged>) -> Element {
 }
 
 #[component]
-fn ItemDeleteButton(item_id: String) -> Element {
+fn ItemDeleteButton(item_id: String, change_signal: Signal<ListChanged>) -> Element {
     let onclick = move |_| {
         spawn({
             let item_id = item_id.clone();
             async move {
-                let _ = delete_item(&item_id).await;
+                let response = delete_item(&item_id).await;
+                if response.is_ok() {
+                    change_signal.write();
+                }
             }
         });
     };
