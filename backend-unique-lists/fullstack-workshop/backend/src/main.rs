@@ -17,8 +17,8 @@ type Database = Arc<RwLock<InMemoryDatabase>>;
 async fn main() {
     let db = Database::default();
     let app = Router::new()
-        .route("/items", get(get_items).post(add_item))
-        .route("/items/:uuid", delete(delete_item))
+        .route("/list/:list_uuid/items", get(get_items).post(add_item))
+        .route("/list/:list_uuid/items/:item_uuid", delete(delete_item))
         .layer(CorsLayer::permissive())
         .with_state(db);
 
