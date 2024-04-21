@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
+use model::ShoppingListItem;
+
 pub struct InMemoryDatabase {
-    inner: HashMap<String, ShoppingItem>,
+    inner: HashMap<String, ShoppingList>,
 }
 
 struct ShoppingList {
@@ -39,47 +41,55 @@ pub struct ShoppingItem {
 }
 
 impl InMemoryDatabase {
-    pub fn get_item(&self, uuid: &str) -> Option<&ShoppingItem> {
-        self.inner.get(uuid)
-    }
-
-    pub fn insert_item(&mut self, uuid: &str, item: ShoppingItem) {
-        self.inner.insert(uuid.to_string(), item);
-    }
-
-    pub fn delete_item(&mut self, uuid: &str) {
-        self.inner.remove(uuid);
-    }
-
-    pub fn as_vec(&self) -> Vec<(String, ShoppingItem)> {
+    pub fn insert_item(
+        &mut self,
+        list_uuid: String,
+        item_uuid: String,
+        shopping_item: ShoppingItem,
+    ) {
         self.inner
-            .iter()
-            .map(|(uuid, item)| (uuid.clone(), item.clone()))
-            .collect()
+            .get_mut(&list_uuid)
+            .and_then(|list| list.list.insert(item_uuid, shopping_item));
+    }
+
+    pub fn delete_item(&mut self, list_uuid: String, item_uuid: String) {
+        self.inner
+            .get_mut(&list_uuid)
+            .and_then(|list| list.list.remove(&item_uuid));
+    }
+
+    pub fn create_list(&mut self, list_uuid: String) {
+        self.inner.insert(list_uuid, ShoppingList::default());
+    }
+
+    fn get_list(&self, list_uuid: String) -> Option<&ShoppingList> {
+        self.inner.get(&list_uuid)
+    }
+
+    pub fn as_vec(&self, list_uuid: String) -> Vec<ShoppingListItem> {
+        let list = self.get_list(list_uuid);
+        match list {
+            Some(list) => list
+                .list
+                .iter()
+                .map(|(key, item)| ShoppingListItem {
+                    title: item.title.clone(),
+                    posted_by: item.creator.clone(),
+                    uuid: key.clone(),
+                })
+                .collect(),
+            None => Vec::default(),
+        }
     }
 }
 
 impl Default for InMemoryDatabase {
     fn default() -> Self {
-        let inner: HashMap<String, ShoppingItem> = [
-            (
-                "b8906da9-0c06-45a7-b117-357b784a8612".to_string(),
-                ShoppingItem {
-                    title: "Salt".to_string(),
-                    creator: "Yasin".to_string(),
-                },
-            ),
-            (
-                "ac18131a-c7b8-4bdc-95b5-e1fb6cad4576".to_string(),
-                ShoppingItem {
-                    title: "Milk".to_string(),
-                    creator: "Tim".to_string(),
-                },
-            ),
-        ]
-        .into_iter()
-        .collect();
-
-        Self { inner }
+        let mut inner = HashMap::new();
+        inner.insert(
+            "9e137e61-08ac-469d-be9d-6b3324dd20ad".to_string(),
+            ShoppingList::default(),
+        );
+        InMemoryDatabase { inner }
     }
 }
