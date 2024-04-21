@@ -41,32 +41,28 @@ pub struct ShoppingItem {
 }
 
 impl InMemoryDatabase {
-    pub fn insert_item(
-        &mut self,
-        list_uuid: String,
-        item_uuid: String,
-        shopping_item: ShoppingItem,
-    ) {
+    pub fn insert_item(&mut self, list_uuid: &str, item_uuid: &str, shopping_item: ShoppingItem) {
         self.inner
-            .get_mut(&list_uuid)
-            .and_then(|list| list.list.insert(item_uuid, shopping_item));
+            .get_mut(list_uuid)
+            .and_then(|list| list.list.insert(item_uuid.to_string(), shopping_item));
     }
 
-    pub fn delete_item(&mut self, list_uuid: String, item_uuid: String) {
+    pub fn delete_item(&mut self, list_uuid: &str, item_uuid: &str) {
         self.inner
-            .get_mut(&list_uuid)
-            .and_then(|list| list.list.remove(&item_uuid));
+            .get_mut(list_uuid)
+            .and_then(|list| list.list.remove(item_uuid));
     }
 
-    pub fn create_list(&mut self, list_uuid: String) {
-        self.inner.insert(list_uuid, ShoppingList::default());
+    pub fn create_list(&mut self, list_uuid: &str) {
+        self.inner
+            .insert(list_uuid.to_string(), ShoppingList::default());
     }
 
-    fn get_list(&self, list_uuid: String) -> Option<&ShoppingList> {
-        self.inner.get(&list_uuid)
+    fn get_list(&self, list_uuid: &str) -> Option<&ShoppingList> {
+        self.inner.get(list_uuid)
     }
 
-    pub fn as_vec(&self, list_uuid: String) -> Vec<ShoppingListItem> {
+    pub fn as_vec(&self, list_uuid: &str) -> Vec<ShoppingListItem> {
         let list = self.get_list(list_uuid);
         match list {
             Some(list) => list
