@@ -4,7 +4,7 @@ use axum::{
     response::IntoResponse,
     Json,
 };
-use model::{PostShopItem, ShoppingListItem};
+use model::{CreateListResponse, PostShopItem, ShoppingListItem};
 use uuid::Uuid;
 
 use crate::{database::ShoppingItem, Database};
@@ -44,6 +44,13 @@ pub async fn add_item(
         }),
     )
         .into_response()
+}
+
+pub async fn create_shopping_list(State(state): State<Database>) -> impl IntoResponse {
+    let uuid = Uuid::new_v4().to_string();
+    state.write().unwrap().create_list(&uuid);
+
+    Json(CreateListResponse { uuid })
 }
 
 pub async fn delete_item(
