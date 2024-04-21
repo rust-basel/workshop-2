@@ -4,6 +4,34 @@ pub struct InMemoryDatabase {
     inner: HashMap<String, ShoppingItem>,
 }
 
+struct ShoppingList {
+    list: HashMap<String, ShoppingItem>,
+}
+
+impl Default for ShoppingList {
+    fn default() -> Self {
+        Self {
+            list: [
+                (
+                    "6855cfc9-78fd-4b66-8671-f3c90ac2abd8".to_string(),
+                    ShoppingItem {
+                        title: "Coffee".to_string(),
+                        creator: "Roland".to_string(),
+                    },
+                ),
+                (
+                    "3d778d1c-5a4e-400f-885d-10212027382d".to_string(),
+                    ShoppingItem {
+                        title: "Tomato Seeds".to_string(),
+                        creator: "Tania".to_string(),
+                    },
+                ),
+            ]
+            .into(),
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct ShoppingItem {
     pub title: String,
