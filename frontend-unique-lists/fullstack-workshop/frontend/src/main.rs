@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::components::{ItemInput, Layout, ListChanged, Profile, ShoppingList};
+use crate::components::{Home, Layout, Profile};
 
 mod components;
 mod controllers;
@@ -18,18 +18,9 @@ pub enum Route {
     Profile {},
 }
 
-#[allow(non_snake_case)]
+#[component]
 fn App() -> Element {
     rsx! {
         Router::<Route>{}
-    }
-}
-
-#[allow(non_snake_case)]
-pub fn Home() -> Element {
-    let change_signal = use_signal(|| ListChanged);
-    rsx! {
-        ShoppingList{change_signal}
-        ItemInput{change_signal}
     }
 }

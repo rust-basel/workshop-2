@@ -216,3 +216,12 @@ pub fn Layout() -> Element {
     }
 }
 
+#[component]
+pub fn Home() -> Element {
+    let list_uuid = use_signal(|| "9e137e61-08ac-469d-be9d-6b3324dd20ad");
+    let change_signal = use_signal(|| ListChanged);
+    rsx! {
+        ShoppingList{list_uuid, change_signal}
+        ItemInput{list_uuid, change_signal}
+    }
+}
