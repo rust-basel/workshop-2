@@ -5,6 +5,15 @@ use crate::controllers::{delete_item, get_items, post_item};
 use crate::Route;
 
 #[component]
+pub fn Home() -> Element {
+    let change_signal = use_signal(|| ListChanged);
+    rsx! {
+        ShoppingList{change_signal}
+        ItemInput{change_signal}
+    }
+}
+
+#[component]
 fn ShoppingListItemComponent(
     display_name: String,
     posted_by: String,
@@ -214,3 +223,4 @@ pub fn Layout() -> Element {
         }
     }
 }
+
