@@ -165,6 +165,7 @@ fn ItemDeleteButton(item_id: String, change_signal: Signal<ListChanged>) -> Elem
     }
 }
 
+#[component]
 pub fn Profile() -> Element {
     rsx! {
         div {
@@ -214,3 +215,4 @@ pub fn Layout() -> Element {
         }
     }
 }
+
