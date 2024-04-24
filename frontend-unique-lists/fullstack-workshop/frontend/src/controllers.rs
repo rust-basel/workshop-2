@@ -1,8 +1,8 @@
 use model::{CreateListResponse, PostShopItem, ShoppingListItem};
 
-pub async fn get_items() -> Result<Vec<ShoppingListItem>, reqwest::Error> {
-    let url = "http://localhost:3001/items";
-    let list = reqwest::get(url)
+pub async fn get_items(list_id: &str) -> Result<Vec<ShoppingListItem>, reqwest::Error> {
+    let url = format!("http://localhost:3001/list/{}/items", list_id);
+    let list = reqwest::get(&url)
         .await?
         .json::<Vec<ShoppingListItem>>()
         .await;
@@ -10,9 +10,12 @@ pub async fn get_items() -> Result<Vec<ShoppingListItem>, reqwest::Error> {
     list
 }
 
-pub async fn post_item(item: PostShopItem) -> Result<ShoppingListItem, reqwest::Error> {
+pub async fn post_item(
+    list_id: &str,
+    item: PostShopItem,
+) -> Result<ShoppingListItem, reqwest::Error> {
     let response = reqwest::Client::new()
-        .post("http://localhost:3001/items")
+        .post(format!("http://localhost:3001/list/{}/items", list_id))
         .json(&item)
         .send()
         .await?
@@ -22,9 +25,12 @@ pub async fn post_item(item: PostShopItem) -> Result<ShoppingListItem, reqwest::
     Ok(response)
 }
 
-pub async fn delete_item(item_id: &str) -> Result<(), reqwest::Error> {
+pub async fn delete_item(list_id: &str, item_id: &str) -> Result<(), reqwest::Error> {
     reqwest::Client::new()
-        .delete(format!("http://localhost:3001/items/{}", item_id))
+        .delete(format!(
+            "http://localhost:3001/list/{}/items/{}",
+            list_id, item_id
+        ))
         .send()
         .await?;
 
