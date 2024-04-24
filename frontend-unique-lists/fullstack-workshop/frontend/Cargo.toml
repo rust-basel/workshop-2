@@ -1,0 +1,10 @@
+[package]
+name = "frontend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dioxus = { version = "0.5.1", features = ["web", "router"] }
+model = { version = "0.1.0", path = "../model" }
+manganis = "0.2.2"
+reqwest = { version = "0.12.3", features = ["json"] }
