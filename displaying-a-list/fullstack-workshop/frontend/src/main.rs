@@ -1,5 +1,7 @@
 use dioxus::prelude::*;
 
+const _STYLE: &str = manganis::mg!(file("public/tailwind.css"));
+
 fn main() {
     launch(App);
 }
@@ -12,7 +14,15 @@ pub fn App() -> Element {
             "Welcome to {rust_basel}"
         }
         button{
-            class: "btn",
+            class: "btn btn-primary",
+            "My stylish button"
+        }
+        button{
+            class: "btn btn-secondary",
+            "My stylish button"
+        }
+        button{
+            class: "btn btn-accent",
             "My stylish button"
         }
         ShoppingList{}

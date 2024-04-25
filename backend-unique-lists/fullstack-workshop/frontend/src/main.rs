@@ -5,6 +5,7 @@ use crate::components::{ItemInput, ListChanged, ShoppingList};
 mod components;
 mod controllers;
 
+const _STYLE: &str = manganis::mg!(file("public/tailwind.css"));
 fn main() {
     launch(App);
 }
