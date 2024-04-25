@@ -6,10 +6,11 @@ use crate::Route;
 
 #[component]
 pub fn Home() -> Element {
+    let list_uuid = use_signal(|| "9e137e61-08ac-469d-be9d-6b3324dd20ad".to_string());
     let change_signal = use_signal(|| ListChanged);
     rsx! {
-        ShoppingList{change_signal}
-        ItemInput{change_signal}
+        ShoppingList{list_uuid, change_signal}
+        ItemInput{list_uuid, change_signal}
     }
 }
 
@@ -17,6 +18,7 @@ pub fn Home() -> Element {
 fn ShoppingListItemComponent(
     display_name: String,
     posted_by: String,
+    list_uuid: String,
     item_id: String,
     change_signal: Signal<ListChanged>,
 ) -> Element {
@@ -30,13 +32,13 @@ fn ShoppingListItemComponent(
             span {
                 "posted by {posted_by}"
             }
-            ItemDeleteButton {item_id, change_signal}
+            ItemDeleteButton {list_uuid, item_id, change_signal}
         }
     }
 }
 
 #[component]
-pub fn ItemInput(change_signal: Signal<ListChanged>) -> Element {
+pub fn ItemInput(list_uuid: Signal<String>, change_signal: Signal<ListChanged>) -> Element {
     let mut item = use_signal(|| "".to_string());
     let mut author = use_signal(|| "".to_string());
 
@@ -45,10 +47,13 @@ pub fn ItemInput(change_signal: Signal<ListChanged>) -> Element {
             async move {
                 let item_name = item.read().to_string();
                 let author = author.read().to_string();
-                let response = post_item(PostShopItem {
-                    title: item_name,
-                    posted_by: author,
-                })
+                let response = post_item(
+                    list_uuid.read().as_str(),
+                    PostShopItem {
+                        title: item_name,
+                        posted_by: author,
+                    },
+                )
                 .await;
 
                 if response.is_ok() {
@@ -98,10 +103,10 @@ pub fn ItemInput(change_signal: Signal<ListChanged>) -> Element {
 pub struct ListChanged;
 
 #[component]
-pub fn ShoppingList(change_signal: Signal<ListChanged>) -> Element {
+pub fn ShoppingList(list_uuid: Signal<String>, change_signal: Signal<ListChanged>) -> Element {
     let items_request = use_resource(move || async move {
         change_signal.read();
-        get_items().await
+        get_items(list_uuid.read().as_str()).await
     });
 
     match &*items_request.read_unchecked() {
@@ -115,6 +120,7 @@ pub fn ShoppingList(change_signal: Signal<ListChanged>) -> Element {
                             ShoppingListItemComponent{
                                 display_name: i.title.clone(),
                                 posted_by: i.posted_by.clone(),
+                                list_uuid,
                                 item_id: i.uuid.clone(),
                                 change_signal
                             },
@@ -141,12 +147,17 @@ pub fn ShoppingList(change_signal: Signal<ListChanged>) -> Element {
 }
 
 #[component]
-fn ItemDeleteButton(item_id: String, change_signal: Signal<ListChanged>) -> Element {
+fn ItemDeleteButton(
+    list_uuid: String,
+    item_id: String,
+    change_signal: Signal<ListChanged>,
+) -> Element {
     let onclick = move |_| {
         spawn({
+            let list_uuid = list_uuid.clone();
             let item_id = item_id.clone();
             async move {
-                let response = delete_item(&item_id).await;
+                let response = delete_item(&list_uuid, &item_id).await;
                 if response.is_ok() {
                     change_signal.write();
                 }
@@ -224,4 +235,3 @@ pub fn Layout() -> Element {
         }
     }
 }
-
