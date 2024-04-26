@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use model::PostShopItem;
 
-use crate::controllers::{delete_item, get_items, post_item};
+use crate::controllers::{create_list, delete_item, get_items, post_item};
 use crate::Route;
 
 #[component]
@@ -11,6 +11,39 @@ pub fn Home(list_uuid: String) -> Element {
     rsx! {
         ShoppingList{list_uuid, change_signal}
         ItemInput{list_uuid, change_signal}
+    }
+}
+
+#[component]
+pub fn LoadOrCreateList() -> Element {
+    let nav = use_navigator();
+
+    let on_create_list_click = move |_| {
+        let nav = nav.clone();
+        spawn({
+            async move {
+                let response = create_list().await;
+                if let Ok(created_list) = response {
+                    nav.push(Route::Home {
+                        list_uuid: created_list.uuid,
+                    });
+                }
+            }
+        });
+    };
+
+    rsx! {
+        div{
+            class: "grid place-content-evently grid-cols-1 md:grid-cols-2 w-full gap-4",
+            div {
+                class: "card glass min-h-500 flex flex-col content-end gap-4 p-4",
+                button{
+                    class: "btn btn-primary",
+                    onclick: on_create_list_click,
+                    "Create new List"
+                }
+            }
+        }
     }
 }
 
@@ -225,7 +258,7 @@ pub fn Layout() -> Element {
             div {
                 class: "navbar flex",
                 div {
-                    Link { class: "p-4", to: Route::Home{}, "Home" }
+                    Link { class: "p-4", to: Route::LoadOrCreateList{}, "Home" }
                     Link { class: "p-4", to: Route::Profile{}, "Profile" }
                 }
             }

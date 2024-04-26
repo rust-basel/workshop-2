@@ -37,7 +37,7 @@ pub async fn delete_item(list_id: &str, item_id: &str) -> Result<(), reqwest::Er
     Ok(())
 }
 
-async fn create_list() -> Result<CreateListResponse, reqwest::Error> {
+pub async fn create_list() -> Result<CreateListResponse, reqwest::Error> {
     let response = reqwest::Client::new()
         .get("http://localhost:3001/list")
         .send()
