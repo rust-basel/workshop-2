@@ -17,6 +17,20 @@ pub fn Home(list_uuid: String) -> Element {
 #[component]
 pub fn LoadOrCreateList() -> Element {
     let nav = use_navigator();
+    let mut list_uuid = use_signal(|| "".to_string());
+
+    let onloadsubmit = move |_| {
+        spawn({
+            async move {
+                let uuid_value = list_uuid.read().clone();
+                if !uuid_value.is_empty() {
+                    nav.push(Route::Home {
+                        list_uuid: uuid_value,
+                    });
+                }
+            }
+        });
+    };
 
     let on_create_list_click = move |_| {
         let nav = nav.clone();
@@ -41,6 +55,27 @@ pub fn LoadOrCreateList() -> Element {
                     class: "btn btn-primary",
                     onclick: on_create_list_click,
                     "Create new List"
+                }
+            }
+            div { class: "card glass min-h-500",
+                form {
+                    onsubmit: onloadsubmit,
+                    div {
+                        class: "flex flex-col gap-4 p-4",
+                        input{
+                            class:"input input-bordered",
+                            r#type:"text",
+                            placeholder:"Enter UUID here...",
+                            id: "uuid",
+                            name: "uuid",
+                            oninput: move |e| list_uuid.set(e.data.value())
+                        }
+                        button{
+                            class: "btn btn-primary",
+                            r#type: "submit",
+                            "Load existing List"
+                        }
+                    }
                 }
             }
         }
