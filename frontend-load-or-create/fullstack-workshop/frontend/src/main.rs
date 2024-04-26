@@ -12,8 +12,8 @@ fn main() {
 #[derive(Routable, Clone)]
 pub enum Route {
     #[layout(Layout)]
-    #[route("/")]
-    Home {},
+    #[route("/list/:list_uuid")]
+    Home { list_uuid: String },
     #[route("/profile")]
     Profile {},
 }

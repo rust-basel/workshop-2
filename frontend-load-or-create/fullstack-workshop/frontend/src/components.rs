@@ -5,8 +5,8 @@ use crate::controllers::{delete_item, get_items, post_item};
 use crate::Route;
 
 #[component]
-pub fn Home() -> Element {
-    let list_uuid = use_signal(|| "9e137e61-08ac-469d-be9d-6b3324dd20ad".to_string());
+pub fn Home(list_uuid: String) -> Element {
+    let list_uuid = use_signal(|| list_uuid);
     let change_signal = use_signal(|| ListChanged);
     rsx! {
         ShoppingList{list_uuid, change_signal}
